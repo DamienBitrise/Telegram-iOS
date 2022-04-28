@@ -61,8 +61,8 @@ index da631a45e..1c6042038 100755
  all_platforms="${all_platforms} arm64-darwin-gcc"
  all_platforms="${all_platforms} arm64-darwin20-gcc"
 +all_platforms="${all_platforms} arm64-iphonesimulator-gcc"
- all_platforms="${all_platforms} arm64-darwin21-gcc"
  all_platforms="${all_platforms} arm64-linux-gcc"
  all_platforms="${all_platforms} arm64-win64-gcc"
+ all_platforms="${all_platforms} arm64-win64-vs15"
 -- 
 2.30.1 (Apple Git-130)
