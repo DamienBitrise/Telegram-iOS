@@ -307,7 +307,7 @@ class BazelCommandLine:
             raise Exception('configuration_path is not defined')
 
         if self.config:
-            combined_arguments += ["--config flare_ci"]
+            combined_arguments += ["--config=flare_ci"]
 
         combined_arguments += [
             '--override_repository=build_configuration={}'.format(self.configuration_path)
@@ -355,7 +355,7 @@ class BazelCommandLine:
         ]
 
         if self.config:
-            combined_arguments += ["--config flare_ci"]
+            combined_arguments += ["--config=flare_ci"]
 
         combined_arguments += self.common_args
         combined_arguments += self.common_build_args
