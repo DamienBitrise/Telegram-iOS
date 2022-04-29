@@ -30,6 +30,7 @@ class BazelCommandLine:
         self.custom_target = None
         self.continue_on_error = False
         self.enable_sandbox = False
+        self.config = None
 
         self.common_args = [
             # https://docs.bazel.build/versions/master/command-line-reference.html
@@ -123,6 +124,9 @@ class BazelCommandLine:
 
     def set_configuration_path(self, path):
         self.configuration_path = path
+
+    def set_config(self, config):
+        self.config = config
 
     def set_configuration(self, configuration):
         if configuration == 'debug_universal':
@@ -302,6 +306,9 @@ class BazelCommandLine:
         if self.configuration_path is None:
             raise Exception('configuration_path is not defined')
 
+        if self.config:
+            combined_arguments += ["--config flare_ci"]
+
         combined_arguments += [
             '--override_repository=build_configuration={}'.format(self.configuration_path)
         ]
@@ -346,6 +353,9 @@ class BazelCommandLine:
         combined_arguments += [
             '--override_repository=build_configuration={}'.format(self.configuration_path)
         ]
+
+        if self.config:
+            combined_arguments += ["--config flare_ci"]
 
         combined_arguments += self.common_args
         combined_arguments += self.common_build_args
@@ -476,6 +486,7 @@ def build(bazel, arguments):
     bazel_command_line.set_custom_target(arguments.target)
     bazel_command_line.set_continue_on_error(arguments.continueOnError)
     bazel_command_line.set_enable_sandbox(arguments.sandbox)
+    bazel_command_line.set_config(arguments.config)
 
     bazel_command_line.set_split_swiftmodules(not arguments.disableParallelSwiftmoduleGeneration)
 
@@ -495,6 +506,7 @@ def test(bazel, arguments):
     elif arguments.cacheHost is not None:
         bazel_command_line.add_remote_cache(arguments.cacheHost)
 
+    bazel_command_line.set_config(arguments.config)
     resolve_configuration(bazel_command_line, arguments)
 
     bazel_command_line.set_configuration('debug_sim_arm64')
@@ -536,7 +548,6 @@ if __name__ == '__main__':
         default=False,
         help='Print debug info'
     )
-
     parser.add_argument(
         '--bazel',
         required=False,
@@ -598,6 +609,12 @@ if __name__ == '__main__':
             Run all tests.
             '''
     )
+    testParser.add_argument(
+        '--config',
+        type=str,
+        metavar='ci',
+        help='Passes `--config ci` argument to bazel',
+    )
     add_project_and_build_common_arguments(testParser)
 
     generateProjectParser = subparsers.add_parser('generateProject', help='Generate Xcode project')
@@ -647,6 +664,13 @@ if __name__ == '__main__':
     )
 
     generateProjectParser.add_argument(
+        '--config',
+        type=str,
+        metavar='ci',
+        help='Passes `--config ci` argument to bazel',
+    )
+
+    generateProjectParser.add_argument(
         '--target',
         type=str,
         help='A custom bazel target name to build.',
@@ -681,6 +705,12 @@ if __name__ == '__main__':
         default=False,
         help='Generate .swiftmodule files in parallel to building modules, can speed up compilation on multi-core '
              'systems. '
+    )
+    buildParser.add_argument(
+        '--config',
+        type=str,
+        metavar='ci',
+        help='Passes `--config ci` argument to bazel',
     )
     buildParser.add_argument(
         '--target',
